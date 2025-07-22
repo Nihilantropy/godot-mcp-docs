@@ -17,11 +17,12 @@ RUN adduser -D appuser && \
 USER appuser
 
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    export PATH="/root/.local/bin:$PATH" && \
-    source $HOME/.local/bin/env
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+
+ENV PATH="/home/appuser/.local/bin:$PATH"
 
 RUN uv sync && source .venv/bin/activate
 
-RUN python docs_converter/godot_docs_converter.py
+RUN uv run python docs_converter/godot_docs_converter.py
 
-CMD ["python", "server.py"]
+CMD ["uv", "run", "python", "main.py"]
