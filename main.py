@@ -10,7 +10,6 @@ from server import mcp
 
 # Import modules to register decorators
 import tools.search_tools
-import tools.navigation_tools
 import resources.doc_resources
 
 def setup_logging():
