@@ -21,7 +21,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
 
 ENV PATH="/home/appuser/.local/bin:$PATH"
 
-RUN uv sync && source .venv/bin/activate
+RUN uv sync
 
 RUN uv run python docs_converter/godot_docs_converter.py
 
