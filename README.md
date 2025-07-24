@@ -1,137 +1,144 @@
 # Godot MCP Server
 
-A Model Context Protocol (MCP) server for serving Godot documentation to AI assistants.
+A Model Context Protocol (MCP) server that provides AI assistants with access to the latest Godot documentation, helping developers with Godot development by serving class documentation directly to LLMs.
 
-## Features
+## Purpose
 
-- **Direct file serving**: Access Godot documentation through MCP resources
-- **Search functionality**: Search across all documentation files
-- **Navigation tools**: Discover and list available documentation sections
-- **Security**: Path validation prevents directory traversal attacks
-- **Stdio transport**: Easy local deployment with no network configuration
+This server bridges the gap between AI assistants and Godot documentation, allowing developers to get instant, accurate answers about Godot classes and their usage without leaving their AI chat interface.
 
-## Installation
+## Deployment
 
-```bash
-# Install dependencies
-uv add "mcp[cli]" pypandoc
-
-# Or with pip
-pip install "mcp[cli]" pypandoc>=1.15
-```
-
-## Setup
-
-1. **Convert Godot docs**: First, use your RST→MD converter to populate the `docs/` directory:
+1. **Clone the repository:**
    ```bash
-   python main.py  # Your existing converter script
+   git clone https://github.com/Nihilantropy/godot-mcp-docs.git
+   cd godot-mcp-docs
    ```
 
-2. **Verify structure**: Ensure your `docs/` directory contains converted markdown files:
-   ```
-   docs/
-   ├── classes/           # API reference
-   ├── tutorials/         # Tutorial documentation  
-   ├── getting_started/   # Setup guides
-   ├── contributing/      # Contribution docs
-   ├── community/         # Community resources
-   └── about/            # Release notes, changelog
+2. **Build the Docker image:**
+   ```bash
+   docker build -f deploy/Dockerfile -t godot-mcp-docs:local .
    ```
 
-## Usage
+3. **Configure your MCP client** (Claude Desktop example):
+   ```json
+   {
+     "mcpServers": {
+       "godot-mcp-docs": {
+         "command": "docker",
+         "args": [
+           "run",
+           "--rm",
+           "-i",
+           "godot-mcp-docs:local"
+         ]
+       }
+     }
+   }
+   ```
 
-### Local Development
-```bash
-# Run the server directly
-python main.py
+## Documentation Structure
 
-# Or with uv
-uv run main.py
-
-# Test with MCP Inspector
-npx @modelcontextprotocol/inspector uv run main.py
-```
-
-### Claude Desktop Integration
-
-Add to your Claude Desktop MCP configuration:
-
-```json
-{
-  "mcpServers": {
-    "godot-docs": {
-      "command": "uv",
-      "args": [
-        "--directory", "/path/to/godot-mcp-server",
-        "run", "main.py"
-      ]
-    }
-  }
-}
-```
-
-## Available Resources
-
-- `godot://classes/{class_name}` - Get API documentation for a specific class
-- `godot://tutorials/{category}/{tutorial_name}` - Get tutorial documentation
-- `godot://getting_started/{guide_name}` - Get setup and basic guides
-- `godot://contributing/{doc_name}` - Get contribution guidelines
-- `godot://community/{doc_name}` - Get community resources
-- `godot://about/{doc_name}` - Get release notes and changelog
-- `godot://doc/{file_path}` - Get any documentation file by path
-
-## Available Tools
-
-### Navigation
-- `list_sections()` - List all documentation sections
-- `list_classes()` - List available Godot classes
-- `list_tutorials()` - List tutorials by category
-- `list_guides()` - List getting started guides
-- `get_documentation_overview()` - Get complete overview
-
-### Search
-- `search_docs(query, section?, max_results?)` - Search documentation content
-- `search_class_methods(class_name, method_query?)` - Search methods in a class
-
-## Project Structure
+The server uses the official Godot documentation with this structure:
 
 ```
-godot-mcp-server/
-├── main.py              # Entry point
-├── server.py            # FastMCP server instance
-├── tools/               # Search and navigation tools
-│   ├── search_tools.py
-│   └── navigation_tools.py
-├── resources/           # Documentation resource handlers
-│   └── doc_resources.py
-├── utils/               # File utilities
-│   └── file_utils.py
-├── docs/                # Converted Godot documentation (created by converter)
-└── pyproject.toml       # Dependencies
+docs/
+├── _styleguides
+├── _tools
+│   └── redirects
+├── about
+├── classes                    # ← Currently exposed
+├── community
+│   └── asset_library
+├── contributing
+│   ├── development
+│   │   ├── compiling
+│   │   ├── configuring_an_ide
+│   │   ├── core_and_modules
+│   │   ├── debugging
+│   │   │   └── vulkan
+│   │   ├── editor
+│   │   └── file_formats
+│   ├── documentation
+│   └── workflow
+├── getting_started
+│   ├── first_2d_game
+│   ├── first_3d_game
+│   ├── introduction
+│   └── step_by_step
+├── img
+└── tutorials
+    ├── 2d
+    ├── 3d
+    │   ├── global_illumination
+    │   ├── particles
+    │   └── procedural_geometry
+    ├── animation
+    ├── assets_pipeline
+    │   ├── escn_exporter
+    │   └── importing_3d_scenes
+    ├── audio
+    ├── best_practices
+    ├── editor
+    ├── export
+    ├── i18n
+    ├── inputs
+    ├── io
+    ├── math
+    ├── migrating
+    ├── navigation
+    ├── networking
+    ├── performance
+    │   └── vertex_animation
+    ├── physics
+    │   └── interpolation
+    ├── platform
+    │   ├── android
+    │   ├── ios
+    │   └── web
+    ├── plugins
+    │   └── editor
+    ├── rendering
+    ├── scripting
+    │   ├── c_sharp
+    │   │   └── diagnostics
+    │   ├── cpp
+    │   ├── debug
+    │   ├── gdextension
+    │   └── gdscript
+    ├── shaders
+    │   ├── shader_reference
+    │   └── your_first_shader
+    ├── ui
+    └── xr
 ```
 
-## Security
+## Available Resources & Tools
 
-- **Path validation**: All file access is validated to prevent directory traversal
-- **Read-only access**: Server only reads documentation files
-- **Directory restrictions**: Access limited to the `docs/` directory
-- **Process isolation**: Stdio transport provides natural sandboxing
+### Resources
+- `godot://classes/{class_name}` - Get specific class documentation
 
-## Development
+### Tools
+- `list_all_classes()` - List all available Godot classes
+- `retrieve_specific_class(class_name: str)` - Get full documentation for a specific class
 
-```bash
-# Install development dependencies
-uv sync
+## Sample Usage
 
-# Run with logging
-python main.py
-
-# Test specific functionality
-python -c "from tools.search_tools import search_docs; print(search_docs('Node'))"
+**List available classes:**
+```
+What Godot classes are available for 2D physics?
 ```
 
-## Troubleshooting
+**Get specific class documentation:**
+```
+Show me the documentation for CharacterBody2D
+```
 
-1. **"Documentation directory not found"**: Ensure the `docs/` directory exists and contains `.md` files
-2. **"No results found"**: Use `list_sections()` to verify available documentation
-3. **Server startup issues**: Check that all dependencies are installed and the `docs/` directory is accessible
+**Learn about a specific feature:**
+```
+How do I use RigidBody2D for physics simulation?
+```
+
+**Compare classes:**
+```
+What's the difference between Node2D and CharacterBody2D?
+```
