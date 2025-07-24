@@ -6,10 +6,11 @@ Serves Godot documentation through MCP with stdio transport
 
 import sys
 import logging
-from server import mcp
+from server import mcp, ensure_docs_dir
 
 # Import modules to register decorators
-import tools.search_tools
+import tools.search_class_tool
+import tools.navigation_tools
 import resources.doc_resources
 
 def setup_logging():
@@ -27,6 +28,14 @@ def main():
     
     try:
         logger.info("Starting Godot MCP Server...")
+        
+        # Check if documentation is available
+        if not ensure_docs_dir():
+            logger.warning("Documentation directory not found or empty. Some tools may not work properly.")
+            logger.warning("Please run 'python docs_converter/godot_docs_converter.py' to download and convert documentation.")
+
+        logger.info("Documentation directory is ready for you my love <3.")
+
         mcp.run(transport="stdio")
     except KeyboardInterrupt:
         logger.info("Server interrupted by user")

@@ -25,4 +25,4 @@ RUN uv sync
 
 RUN uv run python docs_converter/godot_docs_converter.py
 
-CMD ["uv", "run", "python", "main.py"]
+CMD ["uv", "run", "fastmcp", "run", "main.py"]

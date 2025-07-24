@@ -4,7 +4,7 @@ FastMCP server for serving Godot documentation
 """
 
 from pathlib import Path
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 
 # Initialize FastMCP server
 mcp = FastMCP("godot-docs-server")
