@@ -1,13 +1,9 @@
 """
-Godot MCP Server - Core Server Instance
-FastMCP server for serving Godot documentation
+Godot MCP Server - Docs Utilities
+Utility functions for handling documentation files and paths
 """
 
 from pathlib import Path
-from fastmcp import FastMCP
-
-# Initialize FastMCP server
-mcp = FastMCP("godot-docs-server")
 
 # Documentation directory (where converted .md files are stored)
 DOCS_DIR = Path("docs").resolve()
