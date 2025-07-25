@@ -6,12 +6,15 @@ Serves Godot documentation through MCP with stdio transport
 
 import sys
 import logging
-from server import mcp, ensure_docs_dir
+from srcs.utils.docs_utils import ensure_docs_dir
+from srcs.server import mcp
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parent / "srcs"))
 
 # Import modules to register decorators
-import tools.search_class_tool
-import tools.navigation_tools
-import resources.doc_resources
+import srcs.tools.navigation_tools
+import srcs.resources.doc_resources
 
 def setup_logging():
     """Configure logging to stderr (required for stdio transport)"""

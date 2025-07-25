@@ -1,10 +1,15 @@
-# Godot MCP Server
+# Godot MCP Documentation Server
 
-A Model Context Protocol (MCP) server that provides AI assistants with access to the latest Godot documentation, helping developers with Godot development by serving class documentation directly to LLMs.
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue?logo=docker)](https://www.docker.com/)
+[![Godot](https://img.shields.io/badge/Godot-4.x-478cbf?logo=godot-engine)](https://godotengine.org/)
+[![MCP](https://img.shields.io/badge/MCP-Compatible-green)](https://modelcontextprotocol.io/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A Model Context Protocol (MCP) server that provides AI assistants with access to the complete Godot Engine documentation, helping developers with Godot development by serving documentation directly to LLMs.
 
 ## Purpose
 
-This server bridges the gap between AI assistants and Godot documentation, allowing developers to get instant, accurate answers about Godot classes and their usage without leaving their AI chat interface.
+This server bridges the gap between AI assistants and Godot documentation, allowing developers to get instant, accurate answers about Godot classes, tutorials, and features without leaving their AI chat interface.
 
 ## Deployment
 
@@ -38,7 +43,7 @@ This server bridges the gap between AI assistants and Godot documentation, allow
 
 ## Documentation Structure
 
-The server uses the official Godot documentation with this structure:
+The server provides access to the complete official Godot documentation with this structure:
 
 ```
 docs/
@@ -46,7 +51,7 @@ docs/
 ├── _tools
 │   └── redirects
 ├── about
-├── classes                    # ← Currently exposed
+├── classes
 ├── community
 │   └── asset_library
 ├── contributing
@@ -112,20 +117,16 @@ docs/
     └── xr
 ```
 
-## Available Resources & Tools
+## Available Tools
 
-### Resources
-- `godot://classes/{class_name}` - Get specific class documentation
-
-### Tools
-- `list_all_classes()` - List all available Godot classes
-- `retrieve_specific_class(class_name: str)` - Get full documentation for a specific class
+- `get_documentation_tree()` - Get a tree-style overview of the entire documentation structure
+- `get_documentation_file(file_path: str)` - Retrieve the content of specific documentation files
 
 ## Sample Usage
 
-**List available classes:**
+**Explore documentation structure:**
 ```
-What Godot classes are available for 2D physics?
+What documentation is available for Godot?
 ```
 
 **Get specific class documentation:**
@@ -133,12 +134,57 @@ What Godot classes are available for 2D physics?
 Show me the documentation for CharacterBody2D
 ```
 
-**Learn about a specific feature:**
+**Learn about tutorials:**
 ```
-How do I use RigidBody2D for physics simulation?
+What tutorials are available for 2D game development?
+```
+
+**Get specific tutorial content:**
+```
+Show me the first 2D game tutorial
 ```
 
 **Compare classes:**
 ```
 What's the difference between Node2D and CharacterBody2D?
 ```
+
+## Recommended System Prompt
+
+For optimal results when working with Godot, use this system prompt:
+
+> "When working with Godot game development questions, always search for the latest available documentation using the godot-mcp-docs tools. Start with `get_documentation_tree()` to understand the documentation structure, then use `get_documentation_file()` to retrieve specific information about classes, tutorials, or features. Prioritize official Godot documentation over general knowledge when providing Godot-related assistance."
+
+## Screenshots
+
+### MCP Integration in Claude Desktop
+![Claude Desktop Integration](img/claude_desktop_config.png)
+
+### Documentation Access Example
+![Documentation Query Example](img/tool_usage_example.png)
+
+## Updating Documentation
+
+To update to a newer version of Godot documentation:
+
+**Option 1: Rebuild the image**
+```bash
+docker build -f deploy/Dockerfile -t godot-mcp-docs:local . --no-cache
+```
+
+**Option 2: Update manually inside container**
+```bash
+docker run -it --entrypoint /bin/bash godot-mcp-docs:local
+# Inside container:
+python docs_converter/godot_docs_converter.py
+tree docs/. > docs/docs_tree.txt
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+The Godot documentation content follows the original Godot documentation licensing:
+- Documentation content (excluding `classes/` folder): [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- Class reference files (`classes/` folder): MIT License
+- Attribution: "Juan Linietsky, Ariel Manzur and the Godot community"
