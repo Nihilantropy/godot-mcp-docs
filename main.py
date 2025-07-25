@@ -8,6 +8,9 @@ import sys
 import logging
 from srcs.utils.docs_utils import ensure_docs_dir
 from srcs.server import mcp
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parent / "srcs"))
 
 # Import modules to register decorators
 import srcs.tools.navigation_tools

@@ -4,7 +4,8 @@ USER root
 
 RUN apk update && apk add --no-cache \
     pandoc \
-    curl
+    curl \
+    tree
 
 COPY . /app
 
@@ -24,5 +25,7 @@ ENV PATH="/home/appuser/.local/bin:$PATH"
 RUN uv sync
 
 RUN uv run python docs_converter/godot_docs_converter.py
+
+RUN tree docs/. > docs/docs_tree.txt
 
 CMD ["uv", "run", "fastmcp", "run", "main.py"]
