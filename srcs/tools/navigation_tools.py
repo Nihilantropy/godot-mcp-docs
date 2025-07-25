@@ -7,7 +7,6 @@ Tools for navigating and discovering Godot documentation structure
 from srcs.server import mcp
 from utils.docs_utils import get_docs_dir
 from utils.file_utils import read_cached_file
-from resources.doc_resources import get_documentation_resource
 
 @mcp.tool()
 def get_documentation_tree() -> str:
