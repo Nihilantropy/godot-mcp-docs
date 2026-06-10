@@ -7,10 +7,43 @@ import os
 import shutil
 import urllib.request
 import zipfile
+import requests
 
 def download_repo():
     """Download godot-docs ZIP file and extract to docs folder"""
-    zip_url = "https://github.com/godotengine/godot-docs/archive/refs/heads/master.zip"
+
+    
+    versions = None
+
+    try:
+        print("Fetching available versions from GitHub API...\n")
+        response = requests.get(
+            "https://api.github.com/repos/godotengine/godot-docs/branches",
+            timeout=10
+        )
+
+        if response.status_code == 200:
+            branches = response.json()
+            versions = [b["name"] for b in branches]
+
+            print("Available versions:")
+            for v in versions:
+                print(f"- {v}")
+
+    except Exception as e:
+        print(f"Could not fetch versions from GitHub API: {e}")
+
+    # unified input handling (ONLY ONCE)
+    version = input("Enter version (press Enter for latest): ").strip()
+
+    if not version:
+        version = "master"
+
+    elif versions and version not in versions:
+        print(f"Invalid version '{version}', falling back to master")
+        version = "master"
+
+    zip_url = f"https://github.com/godotengine/godot-docs/archive/refs/heads/{version}.zip"
     zip_file = "godot-docs.zip"
     docs_dir = "docs"
     
