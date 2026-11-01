@@ -7,22 +7,23 @@ RUN apk update && apk add --no-cache \
     curl \
     tree
 
-COPY . /app
-
 WORKDIR /app
 
+# create a user
 RUN adduser -D appuser && \
     chown -R appuser:appuser /app && \
     chmod -R 755 /app
-
 USER appuser
-
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-
 ENV PATH="/home/appuser/.local/bin:$PATH"
 
+# install python packages with uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+COPY pyproject.toml .
+
 RUN uv sync
+
+COPY . .
 
 RUN uv run python docs_converter/godot_docs_converter.py
 
